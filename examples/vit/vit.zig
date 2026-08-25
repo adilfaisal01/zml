@@ -67,9 +67,14 @@ const PatchEmbed= struct{
         return .{
             .weight= store.createTensor(subkey: "projection.weight", 
                 tagz: .{.dout, .c, .kh, .kw},
-                partitioning:.{ .dout = .model, .c = .replicated, .kh = .replicated, .kw = .replicated }),
+                partitioning:.{ .dout = .replicated, .c = .replicated, .kh = .replicated, .kw = .replicated }),
 
-            .bias= store.createTensor(subkey: "projection.bias", tagz: .{})
-        }
-    
+            .bias= store.createTensor(subkey: "projection.bias", tagz: .{.dout}, partitioning: .{.dout= .replicated})
+        };
+
+        _=pat;
+
+    pub fn forward (self: PatchEmbed, pixel_values: zml.Tensor) zml.Tensor {
+        const img = zml.T
+    }
 }
