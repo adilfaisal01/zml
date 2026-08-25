@@ -75,6 +75,6 @@ const PatchEmbed= struct{
         _=pat;
 
     pub fn forward (self: PatchEmbed, pixel_values: zml.Tensor) zml.Tensor {
-        const img = zml.T
+        const img = pixel_values.
     }
 }
