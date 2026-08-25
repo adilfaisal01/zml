@@ -52,8 +52,17 @@ pub fn numPatches(self: VitConfig) u32 {
 }
 };
 
+// making the model struct, fill in later
 pub const buffer= zml.Bufferized(Model);
 
 pub const Model = struct{
     embeddings: Embe
 };
+
+// embeddings
+ const Embeddings= struct{
+     patch_embed: PatchEmbedKind,
+     cls_token= zml.Tensor,
+     
+     
+ }
