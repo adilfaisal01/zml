@@ -6,8 +6,6 @@ const log= std.log.scoped(.vit);
 
 // specifying the types of operations that can be done in a ViT
 pub const Pooling= enum{cls, mean, none};
-pub const NormType= enum{rms_norm, layer_norm};
-pub const PatchEmbedKind= enum{conv,hybrid_conv, linear};
 
 // ViT config based off Hugging face transformers repo
 pub const VitConfig= struct {
@@ -48,7 +46,7 @@ pub fn numPatches(self: VitConfig) u32 {
     const image_size:[2]u32=self.imageWh();
     const patch_size:[2]u32= self.patchWH();
 
-    return (image_size[0]/patch_size[0])*(image_size[1]*patch_size[1]);
+    return (image_size[0]/patch_size[0])*(image_size[1]/patch_size[1]);
 }
 };
 
@@ -59,10 +57,19 @@ pub const Model = struct{
     embeddings: Embe
 };
 
-// embeddings
- const Embeddings= struct{
-     patch_embed: PatchEmbedKind,
-     cls_token= zml.Tensor,
-     
-     
- }
+// ViT Patch embeddings
+const PatchEmbed= struct{
+    weight: zml.Tensor,
+    bias: ?zml.Tensor= null,
+
+    pub fn init (store: zml.io.TensorStore.View, config: VitConfig) !PatchEmbed {
+        const patch_size= config.patchWH();
+        return .{
+            .weight= store.createTensor(subkey: "projection.weight", 
+                tagz: .{.dout, .c, .kh, .kw},
+                partitioning:.{ .dout = .model, .c = .replicated, .kh = .replicated, .kw = .replicated }),
+
+            .bias= store.createTensor(subkey: "projection.bias", tagz: .{})
+        }
+    
+}
