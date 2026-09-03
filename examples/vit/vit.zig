@@ -57,7 +57,7 @@ pub const Model = struct{
     embeddings: Embe
 };
 
-// ViT Patch embeddings
+// ViT Patch embeddings using conv2d patch embeddings
 const PatchEmbed= struct{
     weight: zml.Tensor,
     bias: ?zml.Tensor= null,
@@ -75,6 +75,12 @@ const PatchEmbed= struct{
         _=pat;
 
     pub fn forward (self: PatchEmbed, pixel_values: zml.Tensor) zml.Tensor {
-        const img = pixel_values.
+
+        const img = pixel_values.withPartialTags(.{.c,.h,.w});
+        const pat= self.weight.shape();
+
+        var x= img.conv2d(self.weight)
+        
+    
     }
 }
