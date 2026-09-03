@@ -79,8 +79,18 @@ const PatchEmbed= struct{
         const img = pixel_values.withPartialTags(.{.c,.h,.w});
         const pat= self.weight.shape();
 
-        var x= img.conv2d(self.weight)
-        
-    
+        var x= img.conv2d(self.weight, .{
+            .window_strides= .{.h= pat.dim(.kh), .w=pat.dim(.kw)}
+        });
+
+        x= x.flatten(.{.h, .w}, .s);
+        x=x.transpose(.{.b,.s,.dout}).rename(.{.dout=.d});
+
+        if (self.bias) |bias|{
+            x=x.add(bias.broad(x.shape()));
+        }
+        return x;
     }
 }
+
+// Transformer laye
